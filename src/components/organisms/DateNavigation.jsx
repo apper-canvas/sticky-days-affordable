@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { format, addDays, startOfDay, isToday } from 'date-fns';
+import { format, addDays, startOfDay, isToday, isValid } from 'date-fns';
 import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
 
-const DateRangePicker = ({ 
+const DateNavigation = ({ 
+  currentDate,
+  navigateDate,
+  goToToday,
+  titleFormat = 'MMMM yyyy',
+  showNewTaskButton = true,
   dateRange, 
   onRangeChange, 
   onNavigate, 
@@ -11,6 +16,82 @@ const DateRangePicker = ({
   onNewTaskClick 
 }) => {
   const [showRangeDropdown, setShowRangeDropdown] = useState(false);
+
+  // Calendar mode (single date navigation)
+  if (currentDate && navigateDate) {
+    return (
+      <div className="flex-shrink-0 bg-white border-b border-surface-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigateDate('prev')}
+              className="p-2 rounded-lg border border-surface-200 hover:bg-surface-50 transition-colors"
+            >
+              <ApperIcon name="ChevronLeft" size={20} />
+            </Button>
+            
+            <div className="flex flex-col">
+              <h2 className="text-xl font-heading font-semibold text-surface-900">
+                {isValid(currentDate) ? format(currentDate, titleFormat) : 'Invalid Date'}
+              </h2>
+              <div className="flex items-center space-x-2 text-sm text-surface-600">
+                {isToday(currentDate) && (
+                  <span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                    Today
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            <Button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigateDate('next')}
+              className="p-2 rounded-lg border border-surface-200 hover:bg-surface-50 transition-colors"
+            >
+              <ApperIcon name="ChevronRight" size={20} />
+            </Button>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <Button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={goToToday}
+              className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-colors"
+            >
+              Today
+            </Button>
+            
+            {showNewTaskButton && (
+              <Button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onNewTaskClick}
+                className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center space-x-2"
+              >
+                <ApperIcon name="Plus" size={16} />
+                <span>New Task</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Range mode (date range navigation)
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    return (
+      <div className="flex-shrink-0 bg-white border-b border-surface-200 px-6 py-4">
+        <div className="flex items-center justify-center">
+          <div className="text-surface-500">Please select a valid date range</div>
+        </div>
+      </div>
+    );
+  }
 
   const rangeOptions = [
     { value: '7days', label: '7 Days', days: 7 },
@@ -22,18 +103,41 @@ const DateRangePicker = ({
     const today = startOfDay(new Date());
     const option = rangeOptions.find(opt => opt.value === rangeType);
     
-    onRangeChange({
-      start: today,
-      end: addDays(today, option.days - 1),
-      type: rangeType
-    });
+    if (option && onRangeChange) {
+      onRangeChange({
+        start: today,
+        end: addDays(today, option.days - 1),
+        type: rangeType
+      });
+    }
     setShowRangeDropdown(false);
   };
 
   const formatDateRange = () => {
-    const startStr = format(dateRange.start, 'MMM d');
-    const endStr = format(dateRange.end, 'MMM d, yyyy');
-    return `${startStr} - ${endStr}`;
+    if (!isValid(dateRange.start) || !isValid(dateRange.end)) {
+      return 'Invalid Date Range';
+    }
+    
+    const startDate = new Date(dateRange.start);
+    const endDate = new Date(dateRange.end);
+    
+    // Same year
+    if (startDate.getFullYear() === endDate.getFullYear()) {
+      // Same month
+      if (startDate.getMonth() === endDate.getMonth()) {
+        const startStr = format(startDate, 'MMM d');
+        const endStr = format(endDate, 'd, yyyy');
+        return `${startStr} - ${endStr}`;
+      } else {
+        const startStr = format(startDate, 'MMM d');
+        const endStr = format(endDate, 'MMM d, yyyy');
+        return `${startStr} - ${endStr}`;
+      }
+    } else {
+      const startStr = format(startDate, 'MMM d, yyyy');
+      const endStr = format(endDate, 'MMM d, yyyy');
+      return `${startStr} - ${endStr}`;
+    }
   };
 
   const getCurrentRangeLabel = () => {
@@ -42,6 +146,7 @@ const DateRangePicker = ({
   };
 
   const isCurrentRangeActive = () => {
+    if (!isValid(dateRange.start) || !isValid(dateRange.end)) return false;
     const today = new Date();
     return today >= dateRange.start && today <= dateRange.end;
   };
@@ -53,7 +158,7 @@ const DateRangePicker = ({
           <Button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => onNavigate('prev')}
+            onClick={() => onNavigate && onNavigate('prev')}
             className="p-2 rounded-lg border border-surface-200 hover:bg-surface-50 transition-colors"
           >
             <ApperIcon name="ChevronLeft" size={20} />
@@ -76,7 +181,7 @@ const DateRangePicker = ({
           <Button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => onNavigate('next')}
+            onClick={() => onNavigate && onNavigate('next')}
             className="p-2 rounded-lg border border-surface-200 hover:bg-surface-50 transition-colors"
           >
             <ApperIcon name="ChevronRight" size={20} />
@@ -116,7 +221,7 @@ const DateRangePicker = ({
           <Button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={onGoToToday}
+            onClick={onGoToToday || goToToday}
             className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-colors"
           >
             Today
@@ -137,4 +242,4 @@ const DateRangePicker = ({
   );
 };
 
-export default DateRangePicker;
+export default DateNavigation;

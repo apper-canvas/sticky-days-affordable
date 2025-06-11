@@ -46,15 +46,14 @@ const RangeTimeline = ({
     if (handleDragOver) {
       handleDragOver(e);
     }
-  };
+};
 
-const handleSlotDrop = (e, date, timeSlot) => {
+  const handleSlotDrop = (e, date, timeSlot) => {
     e.preventDefault();
     if (handleDrop) {
       handleDrop(e, date, timeSlot);
     }
   };
-
   const TaskCard = ({ task, onEdit, onDelete }) => (
     <motion.div
       draggable
@@ -98,39 +97,49 @@ const handleSlotDrop = (e, date, timeSlot) => {
     </motion.div>
   );
 
-  if (!dates.length) {
+if (!dates.length) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-gray-500">Invalid date range</div>
+        <div className="text-center">
+          <div className="text-surface-500 text-lg font-medium mb-2">Invalid Date Range</div>
+          <div className="text-surface-400 text-sm">Please select a valid date range to view the timeline</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-auto p-4">
+<div className="flex-1 overflow-auto p-4">
       <div className="min-w-full">
-        {/* Header with dates */}
-        <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: `120px repeat(${dates.length}, minmax(150px, 1fr))` }}>
-          <div></div> {/* Empty cell for time labels */}
-          {dates.map((date, index) => (
-            <motion.div
-              key={date.toISOString()}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="text-center p-2 bg-surface-50 rounded-lg"
-            >
-              <div className="font-semibold text-sm">
-                {format(date, 'EEE')}
-              </div>
-              <div className={`text-lg ${isSameDay(date, new Date()) ? 'text-primary font-bold' : ''}`}>
-                {format(date, 'd')}
-              </div>
-              <div className="text-xs text-gray-500">
-                {format(date, 'MMM')}
-              </div>
-            </motion.div>
-          ))}
+        {/* Header with dates - positioned at top */}
+        <div className="sticky top-0 bg-white z-10 mb-4 border-b border-surface-200 pb-4">
+          <div className="grid gap-4" style={{ gridTemplateColumns: `120px repeat(${dates.length}, minmax(150px, 1fr))` }}>
+            <div className="flex items-end pb-2">
+              <span className="text-xs font-medium text-surface-500">Time</span>
+            </div>
+            {dates.map((date, index) => (
+              <motion.div
+                key={date.toISOString()}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="text-center p-3 bg-surface-50 rounded-lg border border-surface-100"
+              >
+                <div className="font-semibold text-sm text-surface-700 mb-1">
+                  {format(date, 'EEE')}
+                </div>
+                <div className={`text-xl font-bold mb-1 ${isSameDay(date, new Date()) ? 'text-primary' : 'text-surface-900'}`}>
+                  {format(date, 'd')}
+                </div>
+                <div className="text-xs text-surface-500">
+                  {format(date, 'MMM yyyy')}
+                </div>
+                {isSameDay(date, new Date()) && (
+                  <div className="mt-1 w-2 h-2 bg-primary rounded-full mx-auto"></div>
+                )}
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* Timeline grid */}
