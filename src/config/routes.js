@@ -6,9 +6,9 @@ export const routes = {
   home: {
     id: 'home',
     label: 'Daily',
-    path: '/',
+path: '/',
     icon: 'Clock',
-component: HomePage
+    component: HomePage
   },
   daily: {
     id: 'daily',

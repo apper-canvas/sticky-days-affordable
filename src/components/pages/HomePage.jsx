@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { taskService } from '@/services';
 import ApperIcon from '@/components/ApperIcon';
 import DateRangePicker from '@/components/organisms/DateRangePicker';
-import RangeTimeline from '@/components/organisms/rangetimeline.jsx';
+import RangeTimeline from '@/components/organisms/RangeTimeline';
 import NewTaskForm from '@/components/organisms/NewTaskForm';
 import Modal from '@/components/molecules/Modal';
 
