@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ApperIcon from './ApperIcon';
+import React, { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import ApperIcon from '@/components/ApperIcon';
+import Button from '@/components/atoms/Button';
+import Input from '@/components/atoms/Input';
 
 const StickyNote = ({ task, onUpdate, onDelete, onDragStart, isDragging }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -48,7 +50,7 @@ const StickyNote = ({ task, onUpdate, onDelete, onDragStart, isDragging }) => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <Button
         layout
         initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
         animate={{ 
@@ -74,17 +76,17 @@ const StickyNote = ({ task, onUpdate, onDelete, onDragStart, isDragging }) => {
         `}
       >
         {/* Delete Button */}
-        <motion.button
+        <Button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={onDelete}
           className="absolute -top-2 -right-2 w-6 h-6 bg-accent text-white rounded-full flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors z-10"
         >
           <ApperIcon name="X" size={12} />
-        </motion.button>
+        </Button>
 
         {/* Completed Checkbox */}
-        <motion.button
+        <Button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={toggleCompleted}
@@ -97,18 +99,18 @@ const StickyNote = ({ task, onUpdate, onDelete, onDragStart, isDragging }) => {
           `}
         >
           {task.completed && <ApperIcon name="Check" size={12} />}
-        </motion.button>
+        </Button>
 
         {/* Task Content */}
         <div className="mt-6 h-full flex flex-col">
           {isEditing ? (
-            <input
+            <Input
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               onBlur={handleSaveEdit}
               onKeyDown={handleKeyPress}
-              className="bg-transparent border-none outline-none text-surface-900 font-medium text-sm resize-none w-full"
+              className="bg-transparent border-none text-surface-900 font-medium text-sm resize-none w-full"
               autoFocus
             />
           ) : (
@@ -130,7 +132,7 @@ const StickyNote = ({ task, onUpdate, onDelete, onDragStart, isDragging }) => {
             </span>
           </div>
         </div>
-      </motion.div>
+      </Button>
     </AnimatePresence>
   );
 };
