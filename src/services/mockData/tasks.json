@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "title": "Review quarterly reports",
+    "date": "2024-01-15",
+    "timeSlot": "9:00 AM",
+    "color": "blue",
+    "completed": false,
+    "createdAt": "2024-01-15T08:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "title": "Team standup meeting",
+    "date": "2024-01-15",
+    "timeSlot": "10:00 AM",
+    "color": "green",
+    "completed": true,
+    "createdAt": "2024-01-15T08:15:00.000Z"
+  },
+  {
+    "id": "3",
+    "title": "Client presentation prep",
+    "date": "2024-01-15",
+    "timeSlot": "2:00 PM",
+    "color": "orange",
+    "completed": false,
+    "createdAt": "2024-01-15T08:30:00.000Z"
+  },
+  {
+    "id": "4",
+    "title": "Code review for authentication feature",
+    "date": "2024-01-15",
+    "timeSlot": "3:00 PM",
+    "color": "purple",
+    "completed": false,
+    "createdAt": "2024-01-15T08:45:00.000Z"
+  },
+  {
+    "id": "5",
+    "title": "Update project documentation",
+    "date": "2024-01-15",
+    "timeSlot": "4:00 PM",
+    "color": "yellow",
+    "completed": false,
+    "createdAt": "2024-01-15T09:00:00.000Z"
+  },
+  {
+    "id": "6",
+    "title": "Planning session for next sprint",
+    "date": "2024-01-16",
+    "timeSlot": "9:00 AM",
+    "color": "pink",
+    "completed": false,
+    "createdAt": "2024-01-16T08:00:00.000Z"
+  },
+  {
+    "id": "7",
+    "title": "Database optimization review",
+    "date": "2024-01-16",
+    "timeSlot": "11:00 AM",
+    "color": "teal",
+    "completed": false,
+    "createdAt": "2024-01-16T08:15:00.000Z"
+  },
+  {
+    "id": "8",
+    "title": "User interview session",
+    "date": "2024-01-16",
+    "timeSlot": "2:00 PM",
+    "color": "lime",
+    "completed": false,
+    "createdAt": "2024-01-16T08:30:00.000Z"
+  },
+  {
+    "id": "9",
+    "title": "Marketing campaign brainstorm",
+    "date": "2024-01-17",
+    "timeSlot": "10:00 AM",
+    "color": "orange",
+    "completed": false,
+    "createdAt": "2024-01-17T08:00:00.000Z"
+  },
+  {
+    "id": "10",
+    "title": "Performance metrics analysis",
+    "date": "2024-01-17",
+    "timeSlot": "1:00 PM",
+    "color": "blue",
+    "completed": false,
+    "createdAt": "2024-01-17T08:15:00.000Z"
+  }
+]
