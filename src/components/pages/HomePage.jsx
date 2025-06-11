@@ -5,9 +5,10 @@ import { toast } from 'react-toastify';
 import { taskService } from '@/services';
 import ApperIcon from '@/components/ApperIcon';
 import DateRangePicker from '@/components/organisms/DateRangePicker';
-import RangeTimeline from '@/components/organisms/RangeTimeline';
+import RangeTimeline from '@/components/organisms/RangeTimeline.jsx';
 import NewTaskForm from '@/components/organisms/NewTaskForm';
 import Modal from '@/components/molecules/Modal';
+
 const HomePage = () => {
   const [dateRange, setDateRange] = useState(() => {
     const today = startOfDay(new Date());
@@ -30,7 +31,8 @@ const HomePage = () => {
   useEffect(() => {
     loadTasks();
   }, [dateRange]);
-const loadTasks = async () => {
+
+  const loadTasks = async () => {
     setLoading(true);
     try {
       const startStr = format(dateRange.start, 'yyyy-MM-dd');
@@ -172,7 +174,7 @@ if (loading) {
     );
   }
 
-return (
+  return (
     <div className="h-full flex flex-col max-w-full overflow-hidden">
       <DateRangePicker
         dateRange={dateRange}
