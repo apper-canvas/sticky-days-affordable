@@ -16,22 +16,37 @@ const RangeTimeline = ({
   handleDragStart = () => {},
   draggedTask = null
 }) => {
-  // Generate array of dates from range
+// Generate array of dates from range
   const getDatesInRange = () => {
     if (!dateRange?.start || !dateRange?.end) return [];
     
-    const dates = [];
-    const start = new Date(dateRange.start);
-    const end = new Date(dateRange.end);
-    
-    for (let current = start; current <= end; current = addDays(current, 1)) {
-      dates.push(new Date(current));
+    try {
+      const dates = [];
+      const start = dateRange.start instanceof Date ? dateRange.start : new Date(dateRange.start);
+      const end = dateRange.end instanceof Date ? dateRange.end : new Date(dateRange.end);
+      
+      // Validate dates
+      if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return [];
+      }
+      
+      // Prevent infinite loops by limiting range
+      const maxDays = 365; // Maximum 1 year
+      let dayCount = 0;
+      
+      let current = new Date(start);
+      while (current <= end && dayCount < maxDays) {
+        dates.push(new Date(current));
+        current = addDays(current, 1);
+        dayCount++;
+      }
+      
+      return dates;
+    } catch (error) {
+      console.error('Error generating date range:', error);
+      return [];
     }
-    
-    return dates;
   };
-
-  const dates = getDatesInRange();
 
   const handleTaskDragStart = (e, task) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -94,12 +109,14 @@ const RangeTimeline = ({
           )}
         </div>
       </div>
-    </motion.div>
+</motion.div>
   );
 
-if (!dates.length) {
+  const dates = getDatesInRange();
+
+  if (!dates.length) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center">
           <div className="text-surface-500 text-lg font-medium mb-2">Invalid Date Range</div>
           <div className="text-surface-400 text-sm">Please select a valid date range to view the timeline</div>
@@ -110,7 +127,7 @@ if (!dates.length) {
 
   return (
 <div className="flex-1 overflow-auto p-4">
-      <div className="min-w-full">
+      <div className="min-w-max">
         {/* Header with dates - positioned at top */}
         <div className="sticky top-0 bg-white z-10 mb-4 border-b border-surface-200 pb-4">
           <div className="grid gap-4" style={{ gridTemplateColumns: `120px repeat(${dates.length}, minmax(150px, 1fr))` }}>
@@ -123,7 +140,7 @@ if (!dates.length) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="text-center p-3 bg-surface-50 rounded-lg border border-surface-100"
+                className="text-center p-3 bg-surface-50 rounded-lg border border-surface-100 min-w-[150px]"
               >
                 <div className="font-semibold text-sm text-surface-700 mb-1">
                   {format(date, 'EEE')}
@@ -154,7 +171,7 @@ if (!dates.length) {
               style={{ gridTemplateColumns: `120px repeat(${dates.length}, minmax(150px, 1fr))` }}
             >
               {/* Time label */}
-              <div className="flex items-center justify-end pr-4 py-2 text-sm font-medium text-gray-600">
+              <div className="flex items-center justify-end pr-4 py-2 text-sm font-medium text-surface-600 min-w-[120px]">
                 {timeSlot}
               </div>
 
@@ -165,7 +182,7 @@ if (!dates.length) {
                 return (
                   <div
                     key={`${date.toISOString()}-${timeSlot}`}
-                    className="min-h-[80px] p-2 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                    className="min-h-[80px] min-w-[150px] p-2 border border-surface-200 rounded-lg bg-white hover:bg-surface-50 transition-colors"
                     onDragOver={handleSlotDragOver}
                     onDrop={(e) => handleSlotDrop(e, date, timeSlot)}
                   >

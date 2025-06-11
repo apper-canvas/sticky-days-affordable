@@ -113,30 +113,36 @@ const DateNavigation = ({
     setShowRangeDropdown(false);
   };
 
-  const formatDateRange = () => {
-    if (!isValid(dateRange.start) || !isValid(dateRange.end)) {
-      return 'Invalid Date Range';
-    }
-    
-    const startDate = new Date(dateRange.start);
-    const endDate = new Date(dateRange.end);
-    
-    // Same year
-    if (startDate.getFullYear() === endDate.getFullYear()) {
-      // Same month
-      if (startDate.getMonth() === endDate.getMonth()) {
-        const startStr = format(startDate, 'MMM d');
-        const endStr = format(endDate, 'd, yyyy');
-        return `${startStr} - ${endStr}`;
+const formatDateRange = () => {
+    try {
+      // Ensure we have valid date objects
+      const startDate = dateRange.start instanceof Date ? dateRange.start : new Date(dateRange.start);
+      const endDate = dateRange.end instanceof Date ? dateRange.end : new Date(dateRange.end);
+      
+      if (!isValid(startDate) || !isValid(endDate)) {
+        return 'Invalid Date Range';
+      }
+      
+      // Same year
+      if (startDate.getFullYear() === endDate.getFullYear()) {
+        // Same month
+        if (startDate.getMonth() === endDate.getMonth()) {
+          const startStr = format(startDate, 'MMM d');
+          const endStr = format(endDate, 'd, yyyy');
+          return `${startStr} - ${endStr}`;
+        } else {
+          const startStr = format(startDate, 'MMM d');
+          const endStr = format(endDate, 'MMM d, yyyy');
+          return `${startStr} - ${endStr}`;
+        }
       } else {
-        const startStr = format(startDate, 'MMM d');
+        const startStr = format(startDate, 'MMM d, yyyy');
         const endStr = format(endDate, 'MMM d, yyyy');
         return `${startStr} - ${endStr}`;
       }
-    } else {
-      const startStr = format(startDate, 'MMM d, yyyy');
-      const endStr = format(endDate, 'MMM d, yyyy');
-      return `${startStr} - ${endStr}`;
+    } catch (error) {
+      console.error('Error formatting date range:', error);
+      return 'Invalid Date Range';
     }
   };
 
@@ -145,10 +151,22 @@ const DateNavigation = ({
     return option ? option.label : '7 Days';
   };
 
-  const isCurrentRangeActive = () => {
-    if (!isValid(dateRange.start) || !isValid(dateRange.end)) return false;
-    const today = new Date();
-    return today >= dateRange.start && today <= dateRange.end;
+const isCurrentRangeActive = () => {
+    try {
+      const startDate = dateRange.start instanceof Date ? dateRange.start : new Date(dateRange.start);
+      const endDate = dateRange.end instanceof Date ? dateRange.end : new Date(dateRange.end);
+      
+      if (!isValid(startDate) || !isValid(endDate)) return false;
+      
+      const today = startOfDay(new Date());
+      const rangeStart = startOfDay(startDate);
+      const rangeEnd = startOfDay(endDate);
+      
+      return today >= rangeStart && today <= rangeEnd;
+    } catch (error) {
+      console.error('Error checking current range:', error);
+      return false;
+    }
   };
 
   return (

@@ -16,7 +16,27 @@ const RangeTimeline = ({
   handleDragStart,
   draggedTask 
 }) => {
-  const days = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
+// Safely generate days array with proper date handling
+  const getDaysFromRange = () => {
+    try {
+      if (!dateRange?.start || !dateRange?.end) return [];
+      
+      const start = dateRange.start instanceof Date ? dateRange.start : new Date(dateRange.start);
+      const end = dateRange.end instanceof Date ? dateRange.end : new Date(dateRange.end);
+      
+      // Validate dates
+      if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return [];
+      }
+      
+      return eachDayOfInterval({ start, end });
+    } catch (error) {
+      console.error('Error generating days from range:', error);
+      return [];
+    }
+  };
+
+  const days = getDaysFromRange();
   const isLargeRange = days.length > 14;
 
   const handleDropOnDate = (e, date, timeSlot) => {
