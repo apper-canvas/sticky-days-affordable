@@ -1,4 +1,4 @@
-import HomePage from '@/components/pages/HomePage.jsx';
+import HomePage from '@/components/pages/homepage.jsx';
 import CalendarPage from '@/components/pages/CalendarPage.jsx';
 import NotFoundPage from '@/components/pages/NotFoundPage.jsx';
 
@@ -8,28 +8,28 @@ export const routes = {
     label: 'Daily',
     path: '/',
     icon: 'Clock',
-component: HomePage
+    component: HomePage
   },
   daily: {
     id: 'daily',
     label: 'Daily',
     path: '/daily',
     icon: 'Clock',
-component: HomePage
+    component: HomePage
   },
   calendar: {
     id: 'calendar',
     label: 'Calendar',
     path: '/calendar',
     icon: 'Calendar',
-component: CalendarPage
+    component: CalendarPage
   },
   notFound: {
     id: 'notFound',
     label: 'Not Found',
     path: '*',
     icon: 'X',
-component: NotFoundPage
+    component: NotFoundPage
   }
 };
 
