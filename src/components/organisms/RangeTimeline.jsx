@@ -4,17 +4,17 @@ import { motion } from 'framer-motion';
 import { format, addDays, isSameDay } from 'date-fns';
 
 const RangeTimeline = ({
-  dateRange,
+  dateRange = null,
   timeSlots = [],
   tasks = [],
-  getTasksForDate,
-  getTasksForTimeSlot,
-  handleDragOver,
-  handleDrop,
-  handleUpdateTask,
-  handleDeleteTask,
-  handleDragStart,
-  draggedTask
+  getTasksForDate = () => [],
+  getTasksForTimeSlot = () => [],
+  handleDragOver = () => {},
+  handleDrop = () => {},
+  handleUpdateTask = () => {},
+  handleDeleteTask = () => {},
+  handleDragStart = () => {},
+  draggedTask = null
 }) => {
   // Generate array of dates from range
   const getDatesInRange = () => {
@@ -48,10 +48,10 @@ const RangeTimeline = ({
     }
   };
 
-  const handleSlotDrop = (e, date, timeSlot) => {
+const handleSlotDrop = (e, date, timeSlot) => {
     e.preventDefault();
     if (handleDrop) {
-      handleDrop(e, timeSlot);
+      handleDrop(e, date, timeSlot);
     }
   };
 
@@ -199,18 +199,5 @@ RangeTimeline.propTypes = {
   draggedTask: PropTypes.object
 };
 
-RangeTimeline.defaultProps = {
-  dateRange: null,
-  timeSlots: [],
-  tasks: [],
-  getTasksForDate: () => [],
-  getTasksForTimeSlot: () => [],
-  handleDragOver: () => {},
-  handleDrop: () => {},
-  handleUpdateTask: () => {},
-  handleDeleteTask: () => {},
-  handleDragStart: () => {},
-  draggedTask: null
-};
 
 export default RangeTimeline;
