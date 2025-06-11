@@ -17,9 +17,19 @@ const taskService = {
     return { ...task };
   },
 
-  async getByDate(date) {
+async getByDate(date) {
     await delay(250);
     return tasks.filter(t => t.date === date).map(t => ({ ...t }));
+  },
+
+  async getByDateRange(startDate, endDate) {
+    await delay(300);
+    return tasks.filter(t => {
+      const taskDate = new Date(t.date);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return taskDate >= start && taskDate <= end;
+    }).map(t => ({ ...t }));
   },
 
   async create(taskData) {

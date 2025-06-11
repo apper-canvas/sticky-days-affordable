@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { format, startOfDay, addDays, subDays } from 'date-fns';
+import { format, startOfDay, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { toast } from 'react-toastify';
 import { taskService } from '@/services';
 import ApperIcon from '@/components/ApperIcon';
-import DateNavigation from '@/components/organisms/DateNavigation';
-import DailyTimeline from '@/components/organisms/DailyTimeline';
+import DateRangePicker from '@/components/organisms/DateRangePicker';
+import RangeTimeline from '@/components/organisms/RangeTimeline';
 import NewTaskForm from '@/components/organisms/NewTaskForm';
 import Modal from '@/components/molecules/Modal';
-
 const HomePage = () => {
-  const [currentDate, setCurrentDate] = useState(startOfDay(new Date()));
+  const [dateRange, setDateRange] = useState(() => {
+    const today = startOfDay(new Date());
+    return {
+      start: today,
+      end: addDays(today, 6),
+      type: '7days'
+    };
+  });
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showNewTaskForm, setShowNewTaskForm] = useState(false);
@@ -23,13 +29,13 @@ const HomePage = () => {
 
   useEffect(() => {
     loadTasks();
-  }, [currentDate]);
-
-  const loadTasks = async () => {
+  }, [dateRange]);
+const loadTasks = async () => {
     setLoading(true);
     try {
-      const dateStr = format(currentDate, 'yyyy-MM-dd');
-      const result = await taskService.getByDate(dateStr);
+      const startStr = format(dateRange.start, 'yyyy-MM-dd');
+      const endStr = format(dateRange.end, 'yyyy-MM-dd');
+      const result = await taskService.getByDateRange(startStr, endStr);
       setTasks(result);
     } catch (error) {
       toast.error('Failed to load tasks');
@@ -38,12 +44,13 @@ const HomePage = () => {
     }
   };
 
-  const handleCreateTask = async (taskData) => {
+const handleCreateTask = async (taskData) => {
     try {
-      const dateStr = format(currentDate, 'yyyy-MM-dd');
+      // Default to today if no date specified, otherwise use the provided date
+      const taskDate = taskData.date || format(new Date(), 'yyyy-MM-dd');
       const newTask = await taskService.create({
         ...taskData,
-        date: dateStr
+        date: taskDate
       });
       setTasks(prev => [...prev, newTask]);
       setShowNewTaskForm(false);
@@ -91,58 +98,98 @@ const HomePage = () => {
     setDraggedTask(null);
   };
 
-  const navigateDate = (direction) => {
-    setCurrentDate(prev => 
-      direction === 'prev' ? subDays(prev, 1) : addDays(prev, 1)
-    );
+const handleRangeChange = (newRange) => {
+    setDateRange(newRange);
+  };
+
+  const navigateRange = (direction) => {
+    const rangeDays = Math.ceil((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
+    const offset = direction === 'prev' ? -rangeDays : rangeDays;
+    
+    setDateRange(prev => ({
+      ...prev,
+      start: addDays(prev.start, offset),
+      end: addDays(prev.end, offset)
+    }));
   };
 
   const goToToday = () => {
-    setCurrentDate(startOfDay(new Date()));
+    const today = startOfDay(new Date());
+    let start, end;
+    
+    switch (dateRange.type) {
+      case '7days':
+        start = today;
+        end = addDays(today, 6);
+        break;
+      case '14days':
+        start = today;
+        end = addDays(today, 13);
+        break;
+      case '30days':
+        start = today;
+        end = addDays(today, 29);
+        break;
+      default:
+        start = today;
+        end = addDays(today, 6);
+    }
+    
+    setDateRange(prev => ({ ...prev, start, end }));
   };
 
-  const getTasksForTimeSlot = (timeSlot) => {
-    return tasks.filter(task => task.timeSlot === timeSlot);
+  const getTasksForDate = (date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return tasks.filter(task => task.date === dateStr);
   };
 
-  if (loading) {
+  const getTasksForTimeSlot = (date, timeSlot) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return tasks.filter(task => task.date === dateStr && task.timeSlot === timeSlot);
+  };
+if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="space-y-4 w-full max-w-4xl mx-auto p-6">
-          {timeSlots.map((slot, index) => (
-            <motion.div
-              key={slot}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="flex items-center space-x-6"
-            >
-              <div className="w-20 h-6 bg-surface-200 rounded animate-pulse"></div>
-              <div className="flex-1 h-16 bg-surface-100 rounded-lg animate-pulse"></div>
-            </motion.div>
-          ))}
+        <div className="w-full max-w-6xl mx-auto p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
+            {Array.from({ length: 7 }, (_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="space-y-2"
+              >
+                <div className="h-8 bg-surface-200 rounded animate-pulse"></div>
+                {timeSlots.slice(0, 4).map((_, slotIndex) => (
+                  <div key={slotIndex} className="h-16 bg-surface-100 rounded-lg animate-pulse"></div>
+                ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  return (
+return (
     <div className="h-full flex flex-col max-w-full overflow-hidden">
-      <DateNavigation
-        currentDate={currentDate}
-        navigateDate={navigateDate}
-        goToToday={goToToday}
+      <DateRangePicker
+        dateRange={dateRange}
+        onRangeChange={handleRangeChange}
+        onNavigate={navigateRange}
+        onGoToToday={goToToday}
         onNewTaskClick={() => setShowNewTaskForm(true)}
-        titleFormat="EEEE, MMMM d"
-        showNewTaskButton={true}
       />
 
-      <DailyTimeline
+      <RangeTimeline
+        dateRange={dateRange}
         timeSlots={timeSlots}
         tasks={tasks}
+        getTasksForDate={getTasksForDate}
+        getTasksForTimeSlot={getTasksForTimeSlot}
         handleDragOver={handleDragOver}
         handleDrop={handleDrop}
-        getTasksForTimeSlot={getTasksForTimeSlot}
         handleUpdateTask={handleUpdateTask}
         handleDeleteTask={handleDeleteTask}
         handleDragStart={handleDragStart}
@@ -154,6 +201,7 @@ const HomePage = () => {
           onSubmit={handleCreateTask}
           onCancel={() => setShowNewTaskForm(false)}
           timeSlots={timeSlots}
+          dateRange={dateRange}
         />
       </Modal>
     </div>
