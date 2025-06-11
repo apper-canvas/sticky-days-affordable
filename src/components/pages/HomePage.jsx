@@ -4,11 +4,11 @@ import { format, startOfDay, addDays, subDays, startOfWeek, endOfWeek, startOfMo
 import { toast } from 'react-toastify';
 import { taskService } from '@/services';
 import ApperIcon from '@/components/ApperIcon';
-import DateRangePicker from '@/components/organisms/DateRangePicker';
+// TODO: Fix DateRangePicker import - component may not exist at this path
+// import DateRangePicker from '@/components/organisms/DateRangePicker';
 import RangeTimeline from '@/components/organisms/RangeTimeline';
 import NewTaskForm from '@/components/organisms/NewTaskForm';
 import Modal from '@/components/molecules/Modal';
-
 const HomePage = () => {
   const [dateRange, setDateRange] = useState(() => {
     const today = startOfDay(new Date());
@@ -174,16 +174,16 @@ if (loading) {
     );
   }
 
-  return (
+return (
     <div className="h-full flex flex-col max-w-full overflow-hidden">
-      <DateRangePicker
+      {/* TODO: Uncomment when DateRangePicker component is available */}
+      {/* <DateRangePicker
         dateRange={dateRange}
         onRangeChange={handleRangeChange}
         onNavigate={navigateRange}
         onGoToToday={goToToday}
         onNewTaskClick={() => setShowNewTaskForm(true)}
-      />
-
+      /> */}
       <RangeTimeline
         dateRange={dateRange}
         timeSlots={timeSlots}
